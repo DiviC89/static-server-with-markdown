@@ -1,5 +1,11 @@
 from htmlnode import LeafNode
 
+text_type_text = "text"
+text_type_bold = "bold"
+text_type_italic = "italic"
+text_type_code = "code"
+text_type_link = "link"
+text_type_image = "image"
 
 class TextNode:
 
@@ -23,21 +29,22 @@ def text_node_to_html_node(text_node):
     tag = None
     value = text_node.text
     props = None
-    if text_node.text_type == "text":
+    if text_node.text_type == text_type_text:
         tag = ""
-    elif text_node.text_type == "bold":
+    elif text_node.text_type == text_type_bold:
         tag = "b"
-    elif text_node.text_type == "italic":
+    elif text_node.text_type == text_type_italic:
         tag = "i"
-    elif text_node.text_type == "code":
+    elif text_node.text_type == text_type_code:
         tag = "code"
-    elif text_node.text_type == "link":
+    elif text_node.text_type == text_type_link:
         tag = "a"
         props = {"href": text_node.url}
-    elif text_node.text_type == "image":
+    elif text_node.text_type == text_type_image:
         tag = "img"
         value = ""
         props = {"src": text_node.url, "alt": text_node.text}
     else:
         raise Exception("No valid tag found to covert textnode to LeafNode")
     return LeafNode(tag, value, props)
+
