@@ -1,11 +1,22 @@
 import re
 
+from htmlnode import HTMLNode, ParentNode
+from inline_markdown import text_to_textnodes
+from textnode import TextNode
+
 block_type_heading = "heading"
 block_type_paragraph = "paragraph"
 block_type_code = "code"
 block_type_quote = "quote"
 block_type_ulist = "unordered_list"
 block_type_olist = "ordered_list"
+
+block_tag_heading = "h"
+block_tag_paragraph = "p"
+block_tag_code = "<pre><code>"
+block_tag_quote = "blockquote"
+block_tag_ulist = "ul"
+block_tag_olist = "ol"
 
 
 def markdown_to_blocks(markdown):
@@ -59,3 +70,36 @@ def block_to_block_type(markdown_block):
     if olist:
         return block_type_olist
     return block_type_paragraph
+
+
+def markdown_to_html_node(markdown):
+    # Create a html node <div>
+    node = HTMLNode("div", None, None, None)
+    node.children = []
+
+    # split markdown inte blocks
+    markdown_blocks = markdown_to_blocks(markdown)
+
+    # loop over blocks to determin what type
+    for block in markdown_blocks:
+        block_type = block_to_block_type(block)
+        if block_type == block_type_paragraph:
+            parent = ParentNode("p", [])
+            text_to_textnodes(block)
+            print(parent)
+        elif block_type == block_type_code:
+            parent = ParentNode("")
+        elif block_type == block_type_quote
+        elif block_type == block_type_heading
+        elif block_type == block_type_ulist
+        elif block_type == block_type_olist
+
+    # text_to_textnodes
+
+    # Create parent nodes (code always needs a pre parent)
+
+    # Create leaf nodes
+
+    # Return complete tree
+
+    return  # hmtl node
