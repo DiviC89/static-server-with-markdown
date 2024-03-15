@@ -1,8 +1,8 @@
 import re
 
-from htmlnode import HTMLNode, ParentNode
+from htmlnode import LeafNode, ParentNode
 from inline_markdown import text_to_textnodes
-from textnode import TextNode, text_node_to_html_node
+from textnode import text_node_to_html_node
 
 block_type_heading = "heading"
 block_type_paragraph = "paragraph"
@@ -27,7 +27,7 @@ def markdown_to_blocks(markdown):
         if len(line) > 0:
             new_block += f"{line}\n"
         elif len(new_block) > 0:
-            new_blocks.append(new_block.strip("\n "))
+            new_blocks.append(new_block.rstrip("\n"))
             new_block = ""
     return new_blocks
 
@@ -72,34 +72,51 @@ def block_to_block_type(markdown_block):
     return block_type_paragraph
 
 
-def markdown_to_html_node(markdown):
-    # Create a html node <div>
-    node = HTMLNode("div", None, None, None)
-    node.children = []
+"""
+Splittar raden till mindre bitar med img osv
+def text_to_textnodes(text):
 
+
+Markdown_to_html_node
+
+                                    parent <div> (mockas upp i func)
+                        parent <pre>    parent <p>          parent <h1> (mockas upp i func)
+
+    parent <code>(mockas upp i fun)     leafs med inline        leafs utan # skapas i text_to_text_node()
+
+line körs igenom text_to_textnodes
+    leaf leaf leaf leaf                 leaf leaf leaf                  leaf leaf leaf leaf
+"""
+
+
+def markdown_to_html_node(markdown):
+    print(markdown)
+    # Create a html node <div>
+    node = ParentNode("div", None, None)
+    node.children = []
     # split markdown inte blocks
     markdown_blocks = markdown_to_blocks(markdown)
-
     # loop over blocks to determin what type
+    leaf_children = []
     for block in markdown_blocks:
         block_type = block_to_block_type(block)
-        # text_to_textnodes
-        text_nodes = text_to_textnodes(block)
-        leaf_children = []
+        # text_to_textnodes for each line
+        text_nodes = text_to_textnodes(block.lstrip(" #.0123456789->"))
         # Create leaf nodes
         for text_node in text_nodes:
-            leaf_node = text_node_to_html_node(text_node)
-            leaf_children.append(leaf_node)
+            if block_type == block_type_ulist or block_type == block_type_ulist:
+                leaf_children.append(
+                    ParentNode("li", [text_node_to_html_node(text_node)])
+                )
+            else:
+                leaf_children.append(text_node_to_html_node(text_node))
         # Create parent nodes
-        parent = ParentNode("p", [])
         if block_type == block_type_code:
-            parent = ParentNode("pre", [])
-            sub_parent = ParentNode("code", [])
-            parent.children = [sub_parent]
-            parent.children[0].children = leaf_children
+            node.children.append(ParentNode("pre", [ParentNode("code", leaf_children)]))
         elif block_type == block_type_quote:
-            parent = ParentNode("blockquote", [])
-
+            node.children.append(ParentNode("blockquote", leaf_children))
+        elif block_type == block_type_paragraph:
+            node.children.append(ParentNode("p", leaf_children))
         elif block_type == block_type_heading:
             header_count = 0
             for char in block:
@@ -107,17 +124,10 @@ def markdown_to_html_node(markdown):
                     header_count += 1
                 else:
                     break
-            parent = ParentNode(f"h{header_count}", [])
-
+            node.children.append(ParentNode(f"h{header_count}", leaf_children))
         elif block_type == block_type_ulist:
-            parent = ParentNode("", [])
-
+            node.children.append(ParentNode("ul", leaf_children))
         elif block_type == block_type_olist:
-            parent = ParentNode("", [])
-
-
-
-
-    # Return complete tree
-
-    return  # hmtl node
+            node.children.append(ParentNode("ol", leaf_children))
+        leaf_children = []
+    return node
