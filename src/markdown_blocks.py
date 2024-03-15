@@ -2,7 +2,7 @@ import re
 
 from htmlnode import HTMLNode, ParentNode
 from inline_markdown import text_to_textnodes
-from textnode import TextNode
+from textnode import TextNode, text_node_to_html_node
 
 block_type_heading = "heading"
 block_type_paragraph = "paragraph"
@@ -83,22 +83,40 @@ def markdown_to_html_node(markdown):
     # loop over blocks to determin what type
     for block in markdown_blocks:
         block_type = block_to_block_type(block)
-        if block_type == block_type_paragraph:
-            parent = ParentNode("p", [])
-            text_to_textnodes(block)
-            print(parent)
-        elif block_type == block_type_code:
-            parent = ParentNode("")
-        elif block_type == block_type_quote
-        elif block_type == block_type_heading
-        elif block_type == block_type_ulist
-        elif block_type == block_type_olist
+        # text_to_textnodes
+        text_nodes = text_to_textnodes(block)
+        leaf_children = []
+        # Create leaf nodes
+        for text_node in text_nodes:
+            leaf_node = text_node_to_html_node(text_node)
+            leaf_children.append(leaf_node)
+        # Create parent nodes
+        parent = ParentNode("p", [])
+        if block_type == block_type_code:
+            parent = ParentNode("pre", [])
+            sub_parent = ParentNode("code", [])
+            parent.children = [sub_parent]
+            parent.children[0].children = leaf_children
+        elif block_type == block_type_quote:
+            parent = ParentNode("blockquote", [])
 
-    # text_to_textnodes
+        elif block_type == block_type_heading:
+            header_count = 0
+            for char in block:
+                if char == "#":
+                    header_count += 1
+                else:
+                    break
+            parent = ParentNode(f"h{header_count}", [])
 
-    # Create parent nodes (code always needs a pre parent)
+        elif block_type == block_type_ulist:
+            parent = ParentNode("", [])
 
-    # Create leaf nodes
+        elif block_type == block_type_olist:
+            parent = ParentNode("", [])
+
+
+
 
     # Return complete tree
 
