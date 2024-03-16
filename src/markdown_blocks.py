@@ -1,6 +1,6 @@
 import re
 
-from htmlnode import LeafNode, ParentNode
+from htmlnode import ParentNode
 from inline_markdown import text_to_textnodes
 from textnode import text_node_to_html_node
 
@@ -17,6 +17,19 @@ block_tag_code = "<pre><code>"
 block_tag_quote = "blockquote"
 block_tag_ulist = "ul"
 block_tag_olist = "ol"
+
+
+def extract_title(markdown: str):
+    title = markdown.split("\n")[0]
+    counter = 0
+    for char in title:
+        if char == "#":
+            counter += 1
+        else:
+            break
+    if counter != 1:
+        raise Exception("MD document don't contain title")
+    return title.lstrip("# ")
 
 
 def markdown_to_blocks(markdown):
