@@ -90,7 +90,6 @@ line körs igenom text_to_textnodes
 
 
 def markdown_to_html_node(markdown):
-    print(markdown)
     # Create a html node <div>
     node = ParentNode("div", None, None)
     node.children = []
@@ -100,15 +99,23 @@ def markdown_to_html_node(markdown):
     leaf_children = []
     for block in markdown_blocks:
         block_type = block_to_block_type(block)
+        block = block.replace("\n", " ").replace("> ", "")
         # text_to_textnodes for each line
-        text_nodes = text_to_textnodes(block.lstrip(" #.0123456789->"))
         # Create leaf nodes
-        for text_node in text_nodes:
-            if block_type == block_type_ulist or block_type == block_type_ulist:
-                leaf_children.append(
-                    ParentNode("li", [text_node_to_html_node(text_node)])
-                )
-            else:
+        if block_type == block_type_ulist or block_type == block_type_olist:
+            split_list_items = re.split(r"[0-9.-]", rf"{block}")
+            for item in split_list_items:
+                if len(item) <= 0:
+                    continue
+                text_nodes = text_to_textnodes(item.strip(" "))
+                parent = ParentNode("li", [])
+                parent.children = []
+                for text_node in text_nodes:
+                    parent.children.append(text_node_to_html_node(text_node))
+                leaf_children.append(parent)
+        else:
+            text_nodes = text_to_textnodes(block.lstrip(" #.>"))
+            for text_node in text_nodes:
                 leaf_children.append(text_node_to_html_node(text_node))
         # Create parent nodes
         if block_type == block_type_code:

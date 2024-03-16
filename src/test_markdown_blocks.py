@@ -15,6 +15,7 @@ from markdown_blocks import (
 
 class TestMarkdownToHTML(unittest.TestCase):
     def test_markdown_to_blocks(self):
+        self.maxDiff = None
         md = """
 This is **bolded** paragraph
 
@@ -35,6 +36,7 @@ This is the same paragraph on a new line
         )
 
     def test_markdown_to_blocks_newlines(self):
+        self.maxDiff = None
         md = """
 This is **bolded** paragraph
 
@@ -58,6 +60,7 @@ This is the same paragraph on a new line
         )
 
     def test_block_to_block_types(self):
+        self.maxDiff = None
         block = "# heading"
         self.assertEqual(block_to_block_type(block), block_type_heading)
         block = "```\ncode\n```"
@@ -115,6 +118,7 @@ This is another paragraph with *italic* text and `code` here
 
 """
 
+        self.maxDiff = None
         node = markdown_to_html_node(md)
         html = node.to_html()
         self.assertEqual(
