@@ -85,23 +85,6 @@ def block_to_block_type(markdown_block):
     return block_type_paragraph
 
 
-"""
-Splittar raden till mindre bitar med img osv
-def text_to_textnodes(text):
-
-
-Markdown_to_html_node
-
-                                    parent <div> (mockas upp i func)
-                        parent <pre>    parent <p>          parent <h1> (mockas upp i func)
-
-    parent <code>(mockas upp i fun)     leafs med inline        leafs utan # skapas i text_to_text_node()
-
-line körs igenom text_to_textnodes
-    leaf leaf leaf leaf                 leaf leaf leaf                  leaf leaf leaf leaf
-"""
-
-
 def markdown_to_html_node(markdown):
     # Create a html node <div>
     node = ParentNode("div", None, None)
